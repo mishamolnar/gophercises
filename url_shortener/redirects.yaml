@@ -1,0 +1,8 @@
+- path: /some-path
+  url: https://www.some-url.com/demo
+- path: /blog
+  url: https://go.dev/blog
+- path: /wiki
+  url: https://en.wikipedia.org/wiki
+- path: /github
+  url: https://github.com/

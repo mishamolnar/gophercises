@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Choose your own adventure</title>
+    <title>Document</title>
+    <style>
+        body {
+            background-color: #eee;
+            box-sizing: border-box;
+            font-family: sans-serif;
+            font-size: 20px;
+            color: #0E191B;
+        }
+
+        .container {
+            width: 1024px;
+            margin-inline: auto;
+            margin-top: 100px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            align-self: center;
+        }
+
+        ul {
+            padding: 0;
+        }
+
+        li {
+            list-style-type: none; /* Remove bullets */
+            padding: 0; /* Remove padding */
+            margin: 0; /* Remove margins */
+        }
+
+        a {
+            display: block;
+            text-decoration: none;
+            padding: 14px 25px;
+            text-align: center;
+            color: #0E191B;
+        }
+
+        a:link {
+            background-color: #ADD8E6;
+        }
+
+        a:visited {
+            background-color: #ADD8E6;
+        }
+
+        a:hover {
+            background-color: #77B1BB;
+        }
+
+        a:active {
+            background-color: #5297A3;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>{{.Title}}</h1>
+    {{range .Paragraphs}}
+        <p>{{.}}</p>
+    {{end}}
+    <ul>
+        {{range .Options }}
+            <li>
+                <a href="/{{.NextArc}}">
+                    {{.Text}}
+                </a>
+            </li>
+        {{end}}
+    </ul>
+</div>
+</body>
+</body>
+</html>
+
+
+{{/*type Arc struct {
+	Title      string   `json:"title"`
+	Paragraphs []string `json:"story"`
+	Options    []Option `json:"options"`
+}
+
+type Option struct {
+	Text    string `json:"text"`
+	NextArc string `json:"arc"`
+}*/}}
