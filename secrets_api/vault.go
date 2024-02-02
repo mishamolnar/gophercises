@@ -1,19 +1,19 @@
 package secrets_api
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
-	"io"
 	"os"
 )
 
-
-//Vault not thread safe, to be done
+// Vault not thread safe, to be done
 type Vault struct {
 	encodingKey string
 	filename    string
 	keyValues   map[string]string
 }
+
+var ctx context.Context
 
 func NewVault(encodingKey, filename string) *Vault {
 	return &Vault{encodingKey: encodingKey, filename: filename}
@@ -26,15 +26,13 @@ func (v *Vault) loadFromFile() error {
 		return nil
 	}
 	defer f.Close()
-	encryptedJson, err := io.ReadAll(f)
+	//file -> decryptor -> json
+	decryptedFileReader, err := DecryptWriter(v.encodingKey, f)
 	if err != nil {
 		return err
 	}
-	decryptedJson, err := Decrypt(v.encodingKey, string(encryptedJson))
-	if err != nil {
-		return fmt.Errorf("while decrypting content %s, error: %v \n", string(encryptedJson), err)
-	}
-	err = json.Unmarshal([]byte(decryptedJson), &v.keyValues)
+	dec := json.NewDecoder(decryptedFileReader)
+	err = dec.Decode(&v.keyValues)
 	if err != nil {
 		return err
 	}
@@ -50,20 +48,18 @@ func (v *Vault) Get(key string) (string, error) {
 }
 
 func (v *Vault) saveToFile() error {
-	b, err := json.Marshal(v.keyValues)
+	//open file, cr
+	f, err := os.OpenFile(v.filename, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return err
 	}
-	hex, err := Encrypt(v.encodingKey, string(b))
-	if err != nil {
-		return fmt.Errorf("While saving to file %v \n", err)
-	}
-	file, err := os.OpenFile(v.filename, os.O_RDWR|os.O_CREATE, 0755)
+	defer f.Close()
+	encryptedFileWriter, err := EncryptWriter(v.encodingKey, f)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-	_, err = file.WriteString(hex)
+	enc := json.NewEncoder(encryptedFileWriter)
+	err = enc.Encode(v.keyValues)
 	if err != nil {
 		return err
 	}
